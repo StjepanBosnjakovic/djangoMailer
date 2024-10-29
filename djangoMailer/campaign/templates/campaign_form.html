@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Email Campaign{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Create Email Campaign</h1>
+
+<!-- Campaign Form -->
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <!-- Hidden field to store selected recipient IDs -->
+    <input type="hidden" name="recipients" id="selected_recipients">
+    <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Create Campaign</button>
+</form>
+
+<!-- Filter Form -->
+<h2 class="text-xl font-bold mt-8 mb-4">Filter Recipients</h2>
+<form method="get" class="mb-4">
+    {{ filter_form.as_p }}
+    <button type="submit" name="filter" value="1" class="px-4 py-2 bg-green-500 text-white rounded">Apply Filters</button>
+    <a href="{% url 'campaign_create' %}" class="ml-4 px-4 py-2 bg-gray-500 text-white rounded">Reset Filters</a>
+</form>
+
+<!-- Recipient Table -->
+<h2 class="text-xl font-bold mb-4">Select Recipients</h2>
+<table class="w-full border-collapse">
+    <thead>
+        <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2 text-left">
+                <input type="checkbox" id="select_all">
+            </th>
+            <th class="border border-gray-300 px-4 py-2 text-left">First Name</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Last Name</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Email</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Company</th>
+            <!-- Add more columns as needed -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for recipient in recipients %}
+        <tr class="hover:bg-gray-50">
+            <td class="border border-gray-300 px-4 py-2">
+                <input type="checkbox" class="recipient_checkbox" value="{{ recipient.id }}">
+            </td>
+            <td class="border border-gray-300 px-4 py-2">{{ recipient.first_name }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ recipient.last_name }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ recipient.email }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ recipient.company }}</td>
+            <!-- Add more columns as needed -->
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center px-4 py-2">No recipients found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<!-- Pagination Controls -->
+<div class="mt-4">
+    <span>
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+    <div class="inline-flex">
+        {% if page_obj.has_previous %}
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page=1" class="px-3 py-1 bg-gray-300 rounded-l">First</a>
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-gray-300">Previous</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-gray-300">Next</a>
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 bg-gray-300 rounded-r">Last</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Include JavaScript to handle recipient selection -->
+<script>
+    const selectAllCheckbox = document.getElementById('select_all');
+    const recipientCheckboxes = document.querySelectorAll('.recipient_checkbox');
+    const selectedRecipientsInput = document.getElementById('selected_recipients');
+    let selectedRecipients = new Set();
+
+    // Load existing selected recipients from hidden input
+    if (selectedRecipientsInput.value) {
+        selectedRecipients = new Set(selectedRecipientsInput.value.split(','));
+    }
+
+    // Function to update the hidden input with selected recipient IDs
+    function updateSelectedRecipientsInput() {
+        selectedRecipientsInput.value = Array.from(selectedRecipients).join(',');
+    }
+
+    // Event listener for individual checkboxes
+    recipientCheckboxes.forEach(checkbox => {
+        // Set checkbox state based on selectedRecipients
+        checkbox.checked = selectedRecipients.has(checkbox.value);
+
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) {
+                selectedRecipients.add(checkbox.value);
+            } else {
+                selectedRecipients.delete(checkbox.value);
+            }
+            updateSelectedRecipientsInput();
+        });
+    });
+
+    // Event listener for "Select All" checkbox
+    selectAllCheckbox.addEventListener('change', () => {
+        const checked = selectAllCheckbox.checked;
+        recipientCheckboxes.forEach(checkbox => {
+            checkbox.checked = checked;
+            if (checked) {
+                selectedRecipients.add(checkbox.value);
+            } else {
+                selectedRecipients.delete(checkbox.value);
+            }
+        });
+        updateSelectedRecipientsInput();
+    });
+
+    // Update "Select All" checkbox based on current page's checkboxes
+    function updateSelectAllCheckbox() {
+        const allChecked = Array.from(recipientCheckboxes).every(checkbox => checkbox.checked);
+        selectAllCheckbox.checked = allChecked;
+    }
+
+    // Call updateSelectAllCheckbox on page load
+    updateSelectAllCheckbox();
+
+    // Update selected recipients on page load (in case of back navigation)
+    document.addEventListener('DOMContentLoaded', () => {
+        updateSelectedRecipientsInput();
+    });
+</script>
+{% endblock %}

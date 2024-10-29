@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+<ul>
+    <li>Total Recipients: {{ recipient_count }}</li>
+    <li>Total Email Templates: {{ template_count }}</li>
+    <li>Total Emails: {{ email_count }}</li>
+    <li>Emails Sent: {{ email_sent_count }}</li>
+    <li>Emails Pending: {{ email_pending_count }}</li>
+    <li>Total Email Logs: {{ email_log_count }}</li>
+</ul>
+{% endblock %}

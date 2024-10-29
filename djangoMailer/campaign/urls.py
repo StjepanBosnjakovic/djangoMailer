@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('', views.home, name='home'),  # Home page
     path('templates/', views.template_list, name='template_list'),
     path('templates/create/', views.template_create, name='template_create'),
     path('queues/', views.queue_list, name='queue_list'),
@@ -11,4 +12,6 @@ urlpatterns = [
     path('recipients/upload/', views.recipient_upload, name='recipient_upload'),
     path('emails/', views.email_list, name='email_list'),
     path('emails/create/', views.email_create, name='email_create'),
+    path('campaigns/', views.campaign_list, name='campaign_list'),
+    path('campaigns/create/', views.campaign_create, name='campaign_create'),
 ]

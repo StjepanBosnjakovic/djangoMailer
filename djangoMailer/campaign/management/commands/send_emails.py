@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
 from django.utils import timezone
-from campaign.models import Email, EmailLog
+from campaign.models import EmailSendCandidate, EmailLog
 from django.conf import settings
 
 MAX_EMAILS_PER_HOUR = 100
@@ -18,7 +18,7 @@ class Command(BaseCommand):
             self.stdout.write('Hourly email limit reached.')
             return
 
-        emails_to_send = Email.objects.filter(sent=False, scheduled_time__lte=now)[:emails_remaining]
+        emails_to_send = EmailSendCandidate.objects.filter(sent=False, scheduled_time__lte=now)[:emails_remaining]
         for email in emails_to_send:
             try:
                 # Personalize the email body if necessary
@@ -45,7 +45,7 @@ class Command(BaseCommand):
                     template=email.template,
                     status='Sent',
                 )
-                self.stdout.write(f"Email sent to {email.recipient.email}")
+                self.stdout.write(f"EmailSendCandidate sent to {email.recipient.email}")
             except Exception as e:
                 EmailLog.objects.create(
                     recipient=email.recipient.email,

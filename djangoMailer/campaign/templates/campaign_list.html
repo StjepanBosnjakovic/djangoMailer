@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Email Campaigns{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Email Campaigns</h1>
+<a href="{% url 'campaign_create' %}" class="mb-4 inline-block px-4 py-2 bg-blue-500 text-white rounded">Create New Campaign</a>
+<table class="w-full border-collapse">
+    <thead>
+        <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2 text-left">Name</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Template</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Scheduled Time</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Recipients</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for campaign in campaigns %}
+        <tr class="hover:bg-gray-50">
+            <td class="border border-gray-300 px-4 py-2">{{ campaign.name }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ campaign.template.name }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ campaign.scheduled_time|date:"Y-m-d H:i:s" }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ campaign.recipients.count }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-center px-4 py-2">No email campaigns found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Email Logs{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Email Logs</h1>
+
+<table class="w-full border-collapse">
+    <thead>
+        <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2 text-left">Recipient</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Template</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Sent Time</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Status</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Error Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr class="hover:bg-gray-50">
+            <td class="border border-gray-300 px-4 py-2">{{ log.recipient }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ log.template.name }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ log.sent_time|date:"Y-m-d H:i:s" }}</td>
+            <td class="border border-gray-300 px-4 py-2">
+                {% if log.status == 'Sent' %}
+                    <span class="text-green-600 font-semibold">{{ log.status }}</span>
+                {% else %}
+                    <span class="text-red-600 font-semibold">{{ log.status }}</span>
+                {% endif %}
+            </td>
+            <td class="border border-gray-300 px-4 py-2">{{ log.error_message|default:'-' }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center px-4 py-2">No email logs found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

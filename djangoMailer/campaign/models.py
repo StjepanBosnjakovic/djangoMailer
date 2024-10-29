@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+
 
 class EmailTemplate(models.Model):
     name = models.CharField(max_length=100)
@@ -41,4 +43,14 @@ class EmailLog(models.Model):
 
     def __str__(self):
         return f"{self.recipient} - {self.status}"
+    
+class EmailCampaign(models.Model):
+    name = models.CharField(max_length=100)
+    template = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE)
+    recipients = models.ManyToManyField(Recipient)
+    scheduled_time = models.DateTimeField()
+
+    def __str__(self):
+        return self.name
+
 

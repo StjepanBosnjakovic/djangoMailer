@@ -1,5 +1,8 @@
-<!DOCTYPE html>
-<html>
+{% extends 'base.html' %}
+
+{% block title %}Email Templates{% endblock %}
+
+{% block content %}
 <head>
     <title>Email Queue</title>
 </head>
@@ -23,4 +26,4 @@
         {% endfor %}
     </table>
 </body>
-</html>
+{% endblock %}

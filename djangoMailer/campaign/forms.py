@@ -1,5 +1,5 @@
 from django import forms
-from .models import EmailTemplate, EmailSendCandidate
+from .models import EmailTemplate, EmailSendCandidate, EmailCampaign, Recipient
 
 class EmailTemplateForm(forms.ModelForm):
     class Meta:
@@ -14,3 +14,26 @@ class EmailForm(forms.ModelForm):
 
 class RecipientUploadForm(forms.Form):
     csv_file = forms.FileField()
+
+
+class EmailCampaignForm(forms.ModelForm):
+    scheduled_time = forms.DateTimeField(
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        required=True
+    )
+
+    class Meta:
+        model = EmailCampaign
+        fields = ['name', 'template', 'scheduled_time']
+
+
+class RecipientFilterForm(forms.Form):
+    first_name = forms.CharField(max_length=100, required=False)
+    last_name = forms.CharField(max_length=100, required=False)
+    company = forms.CharField(max_length=100, required=False)
+    email = forms.EmailField(required=False)
+    country = forms.CharField(max_length=100, required=False)
+    city = forms.CharField(max_length=100, required=False)
+    free_field1 = forms.CharField(max_length=255, required=False)
+    free_field2 = forms.CharField(max_length=255, required=False)
+    free_field3 = forms.CharField(max_length=255, required=False)
