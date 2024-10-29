@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email Queue</title>
+</head>
+<body>
+    <h1>Email Queue</h1>
+    <a href="{% url 'email_create' %}">Create New Email</a>
+    <table border="1">
+        <tr>
+            <th>Recipient</th>
+            <th>Template</th>
+            <th>Scheduled Time</th>
+            <th>Sent</th>
+        </tr>
+        {% for email in emails %}
+        <tr>
+            <td>{{ email.recipient }}</td>
+            <td>{{ email.template.name }}</td>
+            <td>{{ email.scheduled_time }}</td>
+            <td>{{ email.sent }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

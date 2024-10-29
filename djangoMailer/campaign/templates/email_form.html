@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create EmailSendCandidate</title>
+</head>
+<body>
+    <h1>Create EmailSendCandidate</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Queue EmailSendCandidate</button>
+    </form>
+</body>
+</html>

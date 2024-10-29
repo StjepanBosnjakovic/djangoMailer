@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recipient List</title>
+</head>
+<body>
+    <h1>Recipient List</h1>
+    <a href="{% url 'recipient_upload' %}">Upload Recipients</a>
+    <table border="1">
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Company</th>
+            <th>Email</th>
+            <th>Country</th>
+            <th>City</th>
+            <th>Free Field 1</th>
+            <th>Free Field 2</th>
+            <th>Free Field 3</th>
+        </tr>
+        {% for recipient in recipients %}
+        <tr>
+            <td>{{ recipient.first_name }}</td>
+            <td>{{ recipient.last_name }}</td>
+            <td>{{ recipient.company }}</td>
+            <td>{{ recipient.email }}</td>
+            <td>{{ recipient.country }}</td>
+            <td>{{ recipient.city }}</td>
+            <td>{{ recipient.free_field1 }}</td>
+            <td>{{ recipient.free_field2 }}</td>
+            <td>{{ recipient.free_field3 }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

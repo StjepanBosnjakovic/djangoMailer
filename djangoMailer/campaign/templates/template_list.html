@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email Templates</title>
+</head>
+<body>
+    <h1>Email Templates</h1>
+    <a href="{% url 'template_create' %}">Create New Template</a>
+    <ul>
+        {% for template in templates %}
+        <li>{{ template.name }} - <a href="#">Edit</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
