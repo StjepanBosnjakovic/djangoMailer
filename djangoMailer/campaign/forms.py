@@ -116,7 +116,7 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'use_tls', 'use_ssl', 'from_email']
+        fields = ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'use_tls', 'use_ssl', 'from_email', 'max_emails_per_hour']
         widgets = {
             'smtp_password': forms.PasswordInput(),
         }

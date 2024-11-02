@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'campaign',
     'crispy_forms',
-    'crispy_tailwind'
+    'crispy_tailwind',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -76,6 +77,12 @@ TEMPLATES = [
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ["tailwind"] 
 CRISPY_TEMPLATE_PACK = "tailwind"
+
+
+CRONJOBS = [
+    ('*/5 * * * *', 'django.core.management.call_command', ['send_emails'], {'stdout': '>> /path/to/logs/send_emails.log', 'stderr': '>> /path/to/logs/send_emails_errors.log'}),
+]
+
 
 
 
