@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from .models import EmailTemplate, EmailSendCandidate, EmailLog, Recipient, EmailCampaign
+from .models import EmailTemplate, EmailSendCandidate, EmailLog, Recipient, EmailCampaign, UserProfile
 from .forms import EmailTemplateForm, EmailForm, EmailCampaignForm, RecipientFilterForm, UserProfileForm
 from django.core.paginator import Paginator
 import csv, io
@@ -199,7 +199,7 @@ def campaign_list(request):
 
 @login_required
 def edit_profile(request):
-    user_profile = request.user.userprofile
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=user_profile)
         if form.is_valid():

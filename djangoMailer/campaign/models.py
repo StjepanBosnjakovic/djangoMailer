@@ -58,7 +58,7 @@ class EmailCampaign(models.Model):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     smtp_host = models.CharField(max_length=255)
     smtp_port = models.IntegerField(default=587)
     smtp_username = models.CharField(max_length=255)
