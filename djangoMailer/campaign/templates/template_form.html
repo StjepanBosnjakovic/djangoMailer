@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
 {% block title %}Email Templates{% endblock %}
 
@@ -12,19 +13,7 @@
     <h1>Create Email Template</h1>
     <form method="post">
         {% csrf_token %}
-        <p>
-            <label for="id_name">Name:</label><br>
-            {{ form.name }}
-        </p>
-        <p>
-            <label for="id_subject">Subject:</label><br>
-            {{ form.subject }}
-        </p>
-        <p>
-            <label for="id_body">Body:</label><br>
-            {{ form.body }}
-        </p>
-        <button type="submit">Save Template</button>
+        {{ form|crispy }}
     </form>
 </body>
 {% endblock %}

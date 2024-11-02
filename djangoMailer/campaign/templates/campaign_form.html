@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
 
 {% block title %}Create Email Campaign{% endblock %}
 
@@ -8,17 +10,13 @@
 <!-- Campaign Form -->
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <!-- Hidden field to store selected recipient IDs -->
-    <input type="hidden" name="recipients" id="selected_recipients">
-    <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Create Campaign</button>
+    {{ form|crispy }}
 </form>
 
 <!-- Filter Form -->
 <h2 class="text-xl font-bold mt-8 mb-4">Filter Recipients</h2>
-<form method="get" class="mb-4">
-    {{ filter_form.as_p }}
-    <button type="submit" name="filter" value="1" class="px-4 py-2 bg-green-500 text-white rounded">Apply Filters</button>
+<form method="get">
+    {{ filter_form|crispy }}
     <a href="{% url 'campaign_create' %}" class="ml-4 px-4 py-2 bg-gray-500 text-white rounded">Reset Filters</a>
 </form>
 

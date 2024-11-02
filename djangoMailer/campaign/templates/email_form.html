@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
 
 {% block title %}Email Templates{% endblock %}
 
@@ -10,8 +12,7 @@
     <h1>Create EmailSendCandidate</h1>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Queue EmailSendCandidate</button>
+        {{ form|crispy }}
     </form>
 </body>
 {% endblock %}
