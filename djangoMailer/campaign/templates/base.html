@@ -21,6 +21,12 @@
         <a href="{% url 'email_list' %}" class="block mb-2 text-gray-800 hover:underline">Emails</a>
         <a href="{% url 'log_list' %}" class="block mb-2 text-gray-800 hover:underline">Email Logs</a>
         <a href="{% url 'campaign_list' %}" class="block mb-2 text-gray-800 dark:text-gray-100 hover:underline">Email Campaigns</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'edit_profile' %}" class="block mb-2 text-gray-800 dark:text-gray-100 hover:underline">Edit Profile</a>
+            <a href="{% url 'logout' %}" class="block mb-2 text-gray-800 dark:text-gray-100 hover:underline">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="block mb-2 text-gray-800 dark:text-gray-100 hover:underline">Login</a>
+        {% endif %}
         <!-- Add more links as needed -->
     </nav>
     <main class="flex-1 p-5">

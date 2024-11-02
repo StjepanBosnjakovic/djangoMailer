@@ -27,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_REDIRECT_URL = 'home'  # Redirect to 'home' after login
+LOGOUT_REDIRECT_URL = 'login'  # Redirect to 'login' after logout
+
 
 # Application definition
 
@@ -63,9 +66,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.contrib.auth',
-                'django.contrib.contenttypes',
-                'django.contrib.sessions',
                 'campaign.context_processors.statistics',
             ],
         },

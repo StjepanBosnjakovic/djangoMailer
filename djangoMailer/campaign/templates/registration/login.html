@@ -1,0 +1,18 @@
+<head>
+    <title>{% block title %}Email Campaign{% endblock %}</title>
+    <meta charset="UTF-8">
+    <!-- Include Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Enable dark mode in future -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+</head>
+<h1 class="text-2xl font-bold mb-4">Login</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Login</button>
+</form>

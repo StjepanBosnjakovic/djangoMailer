@@ -1,5 +1,5 @@
 from django import forms
-from .models import EmailTemplate, EmailSendCandidate, EmailCampaign, Recipient
+from .models import EmailTemplate, EmailSendCandidate, EmailCampaign, Recipient, UserProfile
 
 class EmailTemplateForm(forms.ModelForm):
     class Meta:
@@ -37,3 +37,11 @@ class RecipientFilterForm(forms.Form):
     free_field1 = forms.CharField(max_length=255, required=False)
     free_field2 = forms.CharField(max_length=255, required=False)
     free_field3 = forms.CharField(max_length=255, required=False)
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'use_tls', 'use_ssl', 'from_email']
+        widgets = {
+            'smtp_password': forms.PasswordInput(),
+        }

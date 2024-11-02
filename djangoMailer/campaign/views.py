@@ -1,14 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 from .models import EmailTemplate, EmailSendCandidate, EmailLog, Recipient, EmailCampaign
-from .forms import EmailTemplateForm, EmailForm, EmailCampaignForm, RecipientFilterForm
+from .forms import EmailTemplateForm, EmailForm, EmailCampaignForm, RecipientFilterForm, UserProfileForm
 from django.core.paginator import Paginator
 import csv, io
 from django.contrib import messages
 from django.utils.encoding import smart_str
 from .forms import RecipientUploadForm
-from django.shortcuts import get_object_or_404
 
-
+@login_required
 def home(request):
     recipient_count = Recipient.objects.count()
     template_count = EmailTemplate.objects.count()
@@ -27,10 +28,12 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
+@login_required
 def template_list(request):
     templates = EmailTemplate.objects.all()
     return render(request, 'template_list.html', {'templates': templates})
 
+@login_required
 def template_create(request):
     if request.method == 'POST':
         form = EmailTemplateForm(request.POST)
@@ -41,10 +44,12 @@ def template_create(request):
         form = EmailTemplateForm()
     return render(request, 'template_form.html', {'form': form})
 
+@login_required
 def queue_list(request):
     queues = EmailSendCandidate.objects.filter(sent=False)
     return render(request, 'queue_list.html', {'queues': queues})
 
+@login_required
 def queue_create(request):
     if request.method == 'POST':
         form = EmailForm(request.POST)
@@ -55,10 +60,12 @@ def queue_create(request):
         form = EmailForm()
     return render(request, 'queue_form.html', {'form': form})
 
+@login_required
 def log_list(request):
     logs = EmailLog.objects.all()
     return render(request, 'log_list.html', {'logs': logs})
 
+@login_required
 def recipient_upload(request):
     if request.method == 'POST':
         form = RecipientUploadForm(request.POST, request.FILES)
@@ -95,16 +102,18 @@ def recipient_upload(request):
         form = RecipientUploadForm()
     return render(request, 'recipient_upload.html', {'form': form})
 
+@login_required
 def recipient_list(request):
     recipients = Recipient.objects.all()
     return render(request, 'recipient_list.html', {'recipients': recipients})
 
 
-
+@login_required
 def email_list(request):
     emails = EmailSendCandidate.objects.filter(sent=False)
     return render(request, 'email_list.html', {'emails': emails})
 
+@login_required
 def email_create(request):
     if request.method == 'POST':
         form = EmailForm(request.POST)
@@ -115,7 +124,7 @@ def email_create(request):
         form = EmailForm()
     return render(request, 'email_form.html', {'form': form})
 
-
+@login_required
 def campaign_create(request):
     if request.method == 'POST':
         form = EmailCampaignForm(request.POST)
@@ -160,6 +169,7 @@ def campaign_create(request):
         'page_obj': page_obj,
     })
 
+@login_required
 def filter_recipients(filters):
     qs = Recipient.objects.all()
     if filters.get('first_name'):
@@ -182,7 +192,19 @@ def filter_recipients(filters):
         qs = qs.filter(free_field3__icontains=filters['free_field3'])
     return qs
 
+@login_required
 def campaign_list(request):
     campaigns = EmailCampaign.objects.all()
     return render(request, 'campaign_list.html', {'campaigns': campaigns})
 
+@login_required
+def edit_profile(request):
+    user_profile = request.user.userprofile
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = UserProfileForm(instance=user_profile)
+    return render(request, 'edit_profile.html', {'form': form})

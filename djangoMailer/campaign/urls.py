@@ -14,4 +14,5 @@ urlpatterns = [
     path('emails/create/', views.email_create, name='email_create'),
     path('campaigns/', views.campaign_list, name='campaign_list'),
     path('campaigns/create/', views.campaign_create, name='campaign_create'),
+    path('profile/edit/', views.edit_profile, name='edit_profile'),
 ]
