@@ -10,6 +10,7 @@ COPY requirements.txt /app/
 # Install Python dependencies
 RUN pip install --upgrade pip --no-cache-dir --progress-bar off
 RUN pip install --no-cache-dir -r requirements.txt gunicorn --progress-bar off
+RUN python manage.py migrate
 
 # Copy the entire project into the container
 COPY . /app/
