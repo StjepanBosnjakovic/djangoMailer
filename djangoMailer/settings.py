@@ -83,6 +83,11 @@ CRONJOBS = [
     ('*/5 * * * *', 'django.core.management.call_command', ['send_emails'], {'stdout': '>> /path/to/logs/send_emails.log', 'stderr': '>> /path/to/logs/send_emails_errors.log'}),
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://mailer.apps.pitsolutions.eu',
+]
+
+CSRF_COOKIE_SECURE = True
 
 
 
