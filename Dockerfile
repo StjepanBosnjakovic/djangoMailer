@@ -15,6 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt gunicorn --progress-bar off
 COPY . /app/
 
 RUN python manage.py migrate
+RUN python manage.py collectstatic --noinput
+RUN python manage.py createsuperuser --noinput || true
 # Expose port 8000 for the Django app
 EXPOSE 8000
 
