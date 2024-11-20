@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt gunicorn --progress-bar off
 COPY . /app/
 
 # Expose port 8000 for the Django app
-EXPOSE 8000
+EXPOSE 443
 
 # Command to run when starting the container
-CMD ["gunicorn", "djangoMailer.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "djangoMailer.wsgi:application", "--bind", "0.0.0.0:443"]
