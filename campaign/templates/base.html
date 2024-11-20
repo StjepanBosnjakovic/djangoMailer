@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}Email Campaign{% endblock %}</title>
+    <meta charset="UTF-8">
+    <!-- Include Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Flowbite CSS via CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
+    <!-- Enable dark mode in future -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+</head>
+<body class="flex m-0 font-sans bg-gray-100 dark:bg-gray-900">
+    <!-- Sidebar -->
+    <aside class="w-64" aria-label="Sidebar">
+        <div class="overflow-y-auto py-4 px-3 bg-white dark:bg-gray-800 h-screen">
+            <a href="#" class="flex items-center pl-2.5 mb-5">
+                <!-- Optional logo or brand name -->
+                <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Email Campaign</span>
+            </a>
+            <ul class="space-y-2">
+                <li>
+                    <a href="{% url 'home' %}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <!-- Home Icon -->
+                        <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" 
+                             fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 2a1 1 0 01.894.553l3.5 7a1 1 0 01-.447 1.341l-7 3.5a1 1 0 01-1.341-.447l-3.5-7a1 1 0 01.447-1.341l7-3.5A1 1 0 0110 2zm0 2.236L4.236 8l2.528 5.056L10 10.764l3.236 2.528L14.764 8 10 4.236z"></path>
+                        </svg>
+                        <span class="ml-3">Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'recipient_list' %}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <!-- Recipients Icon -->
+                        <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400" 
+                             fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 10a5 5 0 00-4.546 2.916A1 1 0 004 14h8a1 1 0 00.546-1.084A5 5 0 008 10z"></path>
+                        </svg>
+                        <span class="ml-3">Recipients</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'template_list' %}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <!-- Templates Icon -->
+                        <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400" 
+                             fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 3a2 2 0 00-2 2v1h16V5a2 2 0 00-2-2H4z"></path>
+                            <path fill-rule="evenodd" d="M18 8H2v7a2 2 0 002 2h12a2 2 0 002-2V8z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="ml-3">Email Templates</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'email_list' %}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <!-- Emails Icon -->
+                        <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400" 
+                             fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2.94 6.94a1.5 1.5 0 010-2.12l6-6a1.5 1.5 0 012.12 0l6 6a1.5 1.5 0 010 2.12l-6 6a1.5 1.5 0 01-2.12 0l-6-6z"></path>
+                        </svg>
+                        <span class="ml-3">Emails</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'log_list' %}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <!-- Logs Icon -->
+                        <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400" 
+                             fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 5h12V3H4v2zM4 9h12V7H4v2zM4 13h12v-2H4v2zM4 17h12v-2H4v2z"></path>
+                        </svg>
+                        <span class="ml-3">Email Logs</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'campaign_list' %}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <!-- Campaigns Icon -->
+                        <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400" 
+                             fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2 2.5A1.5 1.5 0 013.5 1h13A1.5 1.5 0 0118 2.5v15a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 012 17.5v-15zM3.5 2A.5.5 0 003 2.5v15a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-15a.5.5 0 00-.5-.5h-13z"></path>
+                            <path d="M4 4h12v1H4V4zM4 6h12v1H4V6zM4 8h12v1H4V8zM4 10h12v1H4v-1zM4 12h12v1H4v-1zM4 14h12v1H4v-1z"></path>
+                        </svg>
+                        <span class="ml-3">Email Campaigns</span>
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                <li>
+                    <a href="{% url 'edit_profile' %}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <!-- Profile Icon -->
+                        <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400" 
+                             fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M10 3a3 3 0 00-3 3v1a3 3 0 006 0V6a3 3 0 00-3-3zM7 9a3 3 0 006 0V6a3 3 0 00-6 0v3zm-4 9a7 7 0 0114 0H3z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="ml-3">Edit Profile</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'logout' %}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <!-- Logout Icon -->
+                        <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400" 
+                             fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 4a1 1 0 011-1h6a1 1 0 010 2H5v10h5a1 1 0 110 2H4a1 1 0 01-1-1V4z"></path>
+                            <path d="M9 9a1 1 0 000 2h8a1 1 0 000-2H9z"></path>
+                        </svg>
+                        <span class="ml-3">Logout</span>
+                    </a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="{% url 'login' %}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <!-- Login Icon -->
+                        <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400" 
+                             fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 4a1 1 0 011-1h6a1 1 0 010 2H5v10h5a1 1 0 110 2H4a1 1 0 01-1-1V4z"></path>
+                            <path d="M9 9a1 1 0 000 2h8a1 1 0 000-2H9z"></path>
+                        </svg>
+                        <span class="ml-3">Login</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </aside>
+    <!-- Main content -->
+    <div class="flex-1 p-5">
+        {% block content %}
+        <!-- Main content goes here -->
+        {% endblock %}
+    </div>
+    <!-- Include Flowbite JS via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+</body>
+</html>
