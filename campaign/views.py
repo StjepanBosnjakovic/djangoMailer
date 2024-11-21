@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import EmailTemplate, EmailSendCandidate, EmailLog, Recipient, EmailCampaign, UserProfile
 from .forms import EmailTemplateForm, EmailForm, EmailCampaignForm, RecipientFilterForm, UserProfileForm
@@ -208,3 +208,19 @@ def edit_profile(request):
     else:
         form = UserProfileForm(instance=user_profile)
     return render(request, 'edit_profile.html', {'form': form})
+
+@login_required
+def send_email_now(request, pk):
+    email_candidate = get_object_or_404(EmailSendCandidate, pk=pk, user_profile=request.user.profile)
+    
+    # Check if the email has already been sent
+    if email_candidate.sent:
+        messages.error(request, "This email has already been sent.")
+        return redirect('email_list')
+
+    # Update the scheduled_time to now
+    email_candidate.scheduled_time = timezone.now()
+    email_candidate.save()
+
+    messages.success(request, "Email scheduled to be sent immediately.")
+    return redirect('email_list')

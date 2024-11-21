@@ -1,15 +1,111 @@
 {% extends 'base.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h1>Dashboard</h1>
-<ul>
-    <li>Total Recipients: {{ recipient_count }}</li>
-    <li>Total Email Templates: {{ template_count }}</li>
-    <li>Total Emails: {{ email_count }}</li>
-    <li>Emails Sent: {{ email_sent_count }}</li>
-    <li>Emails Pending: {{ email_pending_count }}</li>
-    <li>Total Email Logs: {{ email_log_count }}</li>
-</ul>
+<div class="container mx-auto px-4">
+    <h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">Dashboard</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Total Recipients Card -->
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <!-- Icon -->
+                    <svg class="w-8 h-8 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M13 7H7v6h6V7z"></path>
+                        <path fill-rule="evenodd" d="M5 3a2 2 0 00-2 2v12l4-4h8a2 2 0 002-2V5a2 2 0 00-2-2H5z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <div class="text-lg font-medium text-gray-900 dark:text-white">Total Recipients</div>
+                    <div class="text-3xl font-bold text-gray-700 dark:text-gray-200">{{ recipient_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Email Templates Card -->
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <!-- Icon -->
+                    <svg class="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 3a2 2 0 00-2 2v12l4-4h10a2 2 0 002-2V5a2 2 0 00-2-2H4z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <div class="text-lg font-medium text-gray-900 dark:text-white">Total Email Templates</div>
+                    <div class="text-3xl font-bold text-gray-700 dark:text-gray-200">{{ template_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Emails Card -->
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <!-- Icon -->
+                    <svg class="w-8 h-8 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <div class="text-lg font-medium text-gray-900 dark:text-white">Total Emails</div>
+                    <div class="text-3xl font-bold text-gray-700 dark:text-gray-200">{{ email_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emails Sent Card -->
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <!-- Icon -->
+                    <svg class="w-8 h-8 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 12l2 2 4-4"></path>
+                        <path d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2V9l-4-4H4z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <div class="text-lg font-medium text-gray-900 dark:text-white">Emails Sent</div>
+                    <div class="text-3xl font-bold text-gray-700 dark:text-gray-200">{{ email_sent_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emails Pending Card -->
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <!-- Icon -->
+                    <svg class="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M8.257 3.099c.765-1.36 2.671-1.36 3.436 0l5.005 8.892c.716 1.27-.179 2.863-1.718 2.863H4.97c-1.54 0-2.434-1.593-1.718-2.863l5.005-8.892z"></path>
+                        <path fill-rule="evenodd" d="M11 13a1 1 0 10-2 0 1 1 0 002 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <div class="text-lg font-medium text-gray-900 dark:text-white">Emails Pending</div>
+                    <div class="text-3xl font-bold text-gray-700 dark:text-gray-200">{{ email_pending_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Email Logs Card -->
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <!-- Icon -->
+                    <svg class="w-8 h-8 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 2a2 2 0 00-2 2v11.5A2.5 2.5 0 004.5 18h11a1.5 1.5 0 001.5-1.5V4a2 2 0 00-2-2H4z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <div class="text-lg font-medium text-gray-900 dark:text-white">Total Email Logs</div>
+                    <div class="text-3xl font-bold text-gray-700 dark:text-gray-200">{{ email_log_count }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
