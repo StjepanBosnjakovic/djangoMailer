@@ -5,3 +5,4 @@ gunicorn
 django-crispy-forms==2.3
 django-crontab==0.7.1
 sqlparse==0.5.1
+psycopg2>=2.8
