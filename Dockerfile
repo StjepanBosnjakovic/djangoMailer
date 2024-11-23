@@ -5,10 +5,6 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-RUN apt-get update -o Debug::Acquire::http=true
-
-RUN apt-get install -y dnsutils && nslookup deb.debian.org
-
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
