@@ -24,7 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-lsl=+-_cx@fyyfacz$ew@$+c+m*=e98k2aa=u_h*f6w#dm7c2w")
 
 # Encryption key for encrypted model fields (SMTP passwords)
-FIELD_ENCRYPTION_KEY = os.environ.get("FIELD_ENCRYPTION_KEY", SECRET_KEY)
+# Must be 32 url-safe base64-encoded bytes (Fernet key format)
+# Generate with: from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())
+FIELD_ENCRYPTION_KEY = os.environ.get(
+    "FIELD_ENCRYPTION_KEY",
+    "RKJw8xGzJoaVKMhJzGQrNqP0YXx0K8vZ9tC7BnMxQWE="  # Development only - CHANGE IN PRODUCTION
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")

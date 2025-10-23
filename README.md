@@ -467,9 +467,12 @@ Required for production deployment:
 ```bash
 # Security
 SECRET_KEY=your-secret-key-here
-FIELD_ENCRYPTION_KEY=your-encryption-key-here
 DEBUG=False
 ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+
+# Encryption key for SMTP passwords (must be a Fernet key)
+# Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+FIELD_ENCRYPTION_KEY=your-fernet-key-here
 
 # Database
 POSTGRES_DB=your_database_name
@@ -478,6 +481,16 @@ POSTGRES_PASSWORD=your_database_password
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 ```
+
+**Generating the FIELD_ENCRYPTION_KEY:**
+
+The `FIELD_ENCRYPTION_KEY` must be a valid Fernet key (32 url-safe base64-encoded bytes). Generate one with:
+
+```bash
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+This will output something like: `RKJw8xGzJoaVKMhJzGQrNqP0YXx0K8vZ9tC7BnMxQWE=`
 
 Copy `.env.example` to `.env` and update with your values.
 
