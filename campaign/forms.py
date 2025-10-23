@@ -179,9 +179,29 @@ class UserProfileForm(forms.ModelForm):
             )
         )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        direct_send = cleaned_data.get('direct_send')
+
+        # If not using direct send, SMTP settings are required
+        if not direct_send:
+            smtp_host = cleaned_data.get('smtp_host')
+            smtp_username = cleaned_data.get('smtp_username')
+            smtp_password = cleaned_data.get('smtp_password')
+
+            if not smtp_host:
+                self.add_error('smtp_host', 'SMTP host is required when not using direct send.')
+            if not smtp_username:
+                self.add_error('smtp_username', 'SMTP username is required when not using direct send.')
+            if not smtp_password:
+                self.add_error('smtp_password', 'SMTP password is required when not using direct send.')
+
+        return cleaned_data
+
     class Meta:
         model = UserProfile
         fields = [
+            "direct_send",
             "smtp_host",
             "smtp_port",
             "smtp_username",

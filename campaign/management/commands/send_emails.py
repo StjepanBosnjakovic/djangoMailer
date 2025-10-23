@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from campaign.models import EmailLog, EmailSendCandidate, UserProfile
+from campaign.email_backends import DirectEmailBackend
 
 
 class Command(BaseCommand):
@@ -40,16 +41,22 @@ class Command(BaseCommand):
 
             for email_candidate in emails_to_send:
                 try:
-                    # Use user-specific SMTP settings
-                    backend = EmailBackend(
-                        host=user_profile.smtp_host,
-                        port=user_profile.smtp_port,
-                        username=user_profile.smtp_username,
-                        password=user_profile.smtp_password,
-                        use_tls=user_profile.use_tls,
-                        use_ssl=user_profile.use_ssl,
-                        fail_silently=False,
-                    )
+                    # Use direct sending or user-specific SMTP settings
+                    if user_profile.direct_send:
+                        backend = DirectEmailBackend(
+                            fail_silently=False,
+                            from_email=user_profile.from_email,
+                        )
+                    else:
+                        backend = EmailBackend(
+                            host=user_profile.smtp_host,
+                            port=user_profile.smtp_port,
+                            username=user_profile.smtp_username,
+                            password=user_profile.smtp_password,
+                            use_tls=user_profile.use_tls,
+                            use_ssl=user_profile.use_ssl,
+                            fail_silently=False,
+                        )
 
                     # Personalize the email body if necessary
                     message = email_candidate.campaign.template.body.format(

@@ -20,6 +20,7 @@ A multi-user email campaign management and bulk email sending platform built wit
 - **Recipient Filtering**: Advanced filtering by multiple criteria
 - **Scheduled Sending**: Queue emails for future delivery
 - **Dashboard Analytics**: Real-time statistics on recipients, campaigns, and email status
+- **Flexible Email Delivery**: Choose between direct server sending (no SMTP required) or traditional SMTP relay
 - **SMTP Configuration**: User-specific SMTP settings for flexible email provider integration
 
 ## Technologies Used
@@ -30,6 +31,7 @@ A multi-user email campaign management and bulk email sending platform built wit
 - **PostgreSQL** - Primary database
 - **Gunicorn** - WSGI HTTP server
 - **django-crontab** - Scheduled task execution (5-minute intervals)
+- **dnspython** - DNS MX record lookup for direct email sending
 
 ### Frontend
 - **Tailwind CSS** - Utility-first CSS framework (CDN)
@@ -46,7 +48,7 @@ A multi-user email campaign management and bulk email sending platform built wit
 - Python 3.11 or higher
 - PostgreSQL database
 - Docker (optional, for containerized deployment)
-- SMTP server credentials for sending emails
+- SMTP server credentials (optional, required only if not using direct send)
 
 ## Installation
 
@@ -136,21 +138,45 @@ A multi-user email campaign management and bulk email sending platform built wit
 
 ## Configuration
 
-### SMTP Settings
+### Email Sending Configuration
 
-Each user can configure their own SMTP settings through the web interface:
+Each user can configure how emails are sent through the web interface:
 
 1. Log in to your account
 2. Navigate to **Edit Profile** in the sidebar
-3. Configure the following settings:
+3. Choose your email sending method:
+
+#### Option 1: Direct Server Sending (No SMTP Required)
+   - **Direct Send**: Enable this option to send emails directly to recipient mail servers
+   - **From Email**: Email address to send from
+   - **Max Emails Per Hour**: Rate limit for email sending
+
+**Advantages:**
+- No third-party SMTP server required
+- No SMTP credentials needed
+- Direct connection to recipient mail servers
+
+**Important Considerations:**
+- May have lower deliverability rates compared to established SMTP providers
+- Recipient servers may block or filter emails due to missing SPF/DKIM/DMARC records
+- Requires proper DNS configuration for best results
+- Best suited for internal networks or controlled environments
+
+#### Option 2: SMTP Server (Traditional Method)
+   - **Direct Send**: Leave this disabled to use SMTP
    - **SMTP Host**: Your email server hostname (e.g., smtp.gmail.com)
    - **SMTP Port**: Server port (typically 587 for TLS or 465 for SSL)
    - **SMTP Username**: Your email account username
-   - **SMTP Password**: Your email account password
+   - **SMTP Password**: Your email account password (encrypted in database)
    - **Use TLS**: Enable for secure connection (recommended)
    - **Use SSL**: Alternative to TLS
    - **From Email**: Email address to send from
    - **Max Emails Per Hour**: Rate limit for email sending
+
+**Advantages:**
+- Better deliverability through established email providers
+- SPF/DKIM/DMARC already configured
+- Suitable for production use
 
 ### Database Configuration
 
