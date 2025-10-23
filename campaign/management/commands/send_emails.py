@@ -1,19 +1,25 @@
 # campaign/management/commands/send_emails.py
 
-from django.core.management.base import BaseCommand
 from django.core.mail import EmailMessage
-from django.utils import timezone
-from campaign.models import EmailSendCandidate, EmailLog, UserProfile
 from django.core.mail.backends.smtp import EmailBackend
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+
+from campaign.models import EmailLog, EmailSendCandidate, UserProfile
+
 
 class Command(BaseCommand):
-    help = 'Send queued emails'
+    help = "Send queued emails"
 
     def handle(self, *args, **options):
         now = timezone.now()
 
         # Get distinct users who have pending emails
-        users_with_pending_emails = EmailSendCandidate.objects.filter(sent=False, scheduled_time__lte=now).values_list('campaign__user', flat=True).distinct()
+        users_with_pending_emails = (
+            EmailSendCandidate.objects.filter(sent=False, scheduled_time__lte=now)
+            .values_list("campaign__user", flat=True)
+            .distinct()
+        )
 
         for user_id in users_with_pending_emails:
             user_profile = UserProfile.objects.get(user__id=user_id)
@@ -25,14 +31,12 @@ class Command(BaseCommand):
             emails_sent_last_hour = EmailLog.objects.filter(campaign__user=user, sent_time__gte=one_hour_ago).count()
             emails_remaining = max_emails_per_hour - emails_sent_last_hour
             if emails_remaining <= 0:
-                self.stdout.write(f'Hourly email limit reached for user {user.username}.')
+                self.stdout.write(f"Hourly email limit reached for user {user.username}.")
                 continue
 
             emails_to_send = EmailSendCandidate.objects.filter(
-                sent=False,
-                scheduled_time__lte=now,
-                campaign__user=user
-            ).order_by('scheduled_time')[:emails_remaining]
+                sent=False, scheduled_time__lte=now, campaign__user=user
+            ).order_by("scheduled_time")[:emails_remaining]
 
             for email_candidate in emails_to_send:
                 try:
@@ -72,7 +76,7 @@ class Command(BaseCommand):
                     EmailLog.objects.create(
                         recipient=email_candidate.recipient.email,
                         campaign=email_candidate.campaign,
-                        status='Sent',
+                        status="Sent",
                         sent_time=now,
                     )
                     self.stdout.write(f"Email sent to {email_candidate.recipient.email} for user {user.username}")
@@ -80,8 +84,10 @@ class Command(BaseCommand):
                     EmailLog.objects.create(
                         recipient=email_candidate.recipient.email,
                         campaign=email_candidate.campaign,
-                        status='Failed',
+                        status="Failed",
                         error_message=str(e),
                         sent_time=now,
                     )
-                    self.stdout.write(f"Failed to send email to {email_candidate.recipient.email} for user {user.username}: {e}")
+                    self.stdout.write(
+                        f"Failed to send email to {email_candidate.recipient.email} for user {user.username}: {e}"
+                    )
