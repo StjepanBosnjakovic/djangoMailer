@@ -6,7 +6,7 @@ db.sqlite3
 *__pycache__*
 .DS_Store
 .env
-*.sample_envvenv/
+*.sample_env
+venv/
 *.pyc
 __pycache__/
-db.sqlite3
