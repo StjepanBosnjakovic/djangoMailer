@@ -13,12 +13,13 @@ from .models import EmailCampaign, EmailLog, EmailSendCandidate, EmailTemplate, 
 
 @login_required
 def home(request):
-    recipient_count = Recipient.objects.count()
-    template_count = EmailTemplate.objects.count()
-    email_count = EmailSendCandidate.objects.count()
-    email_sent_count = EmailSendCandidate.objects.filter(sent=True).count()
-    email_pending_count = EmailSendCandidate.objects.filter(sent=False).count()
-    email_log_count = EmailLog.objects.count()
+    user_profile = request.user.profile
+    recipient_count = Recipient.objects.filter(user_profile=user_profile).count()
+    template_count = EmailTemplate.objects.filter(user_profile=user_profile).count()
+    email_count = EmailSendCandidate.objects.filter(user_profile=user_profile).count()
+    email_sent_count = EmailSendCandidate.objects.filter(user_profile=user_profile, sent=True).count()
+    email_pending_count = EmailSendCandidate.objects.filter(user_profile=user_profile, sent=False).count()
+    email_log_count = EmailLog.objects.filter(user_profile=user_profile).count()
 
     context = {
         "recipient_count": recipient_count,
@@ -33,7 +34,7 @@ def home(request):
 
 @login_required
 def template_list(request):
-    templates = EmailTemplate.objects.all()
+    templates = EmailTemplate.objects.filter(user_profile=request.user.profile)
     return render(request, "template_list.html", {"templates": templates})
 
 
@@ -42,7 +43,9 @@ def template_create(request):
     if request.method == "POST":
         form = EmailTemplateForm(request.POST)
         if form.is_valid():
-            form.save()
+            template = form.save(commit=False)
+            template.user_profile = request.user.profile
+            template.save()
             return redirect("template_list")
     else:
         form = EmailTemplateForm()
@@ -51,7 +54,7 @@ def template_create(request):
 
 @login_required
 def queue_list(request):
-    queues = EmailSendCandidate.objects.filter(sent=False)
+    queues = EmailSendCandidate.objects.filter(user_profile=request.user.profile, sent=False)
     return render(request, "queue_list.html", {"queues": queues})
 
 
@@ -60,16 +63,21 @@ def queue_create(request):
     if request.method == "POST":
         form = EmailForm(request.POST)
         if form.is_valid():
-            form.save()
+            email = form.save(commit=False)
+            email.user_profile = request.user.profile
+            email.save()
             return redirect("queue_list")
     else:
         form = EmailForm()
+        # Filter form choices by user profile
+        form.fields['recipient'].queryset = Recipient.objects.filter(user_profile=request.user.profile)
+        form.fields['template'].queryset = EmailTemplate.objects.filter(user_profile=request.user.profile)
     return render(request, "queue_form.html", {"form": form})
 
 
 @login_required
 def log_list(request):
-    logs = EmailLog.objects.all()
+    logs = EmailLog.objects.filter(user_profile=request.user.profile)
     return render(request, "log_list.html", {"logs": logs})
 
 
@@ -92,6 +100,7 @@ def recipient_upload(request):
 
             for row in csv.reader(io_string, delimiter=",", quotechar='"'):
                 _, created = Recipient.objects.update_or_create(
+                    user_profile=request.user.profile,
                     email=row[3],
                     defaults={
                         "first_name": row[0],
@@ -113,13 +122,13 @@ def recipient_upload(request):
 
 @login_required
 def recipient_list(request):
-    recipients = Recipient.objects.all()
+    recipients = Recipient.objects.filter(user_profile=request.user.profile)
     return render(request, "recipient_list.html", {"recipients": recipients})
 
 
 @login_required
 def email_list(request):
-    emails = EmailSendCandidate.objects.filter(sent=False)
+    emails = EmailSendCandidate.objects.filter(user_profile=request.user.profile, sent=False)
     return render(request, "email_list.html", {"emails": emails})
 
 
@@ -128,10 +137,15 @@ def email_create(request):
     if request.method == "POST":
         form = EmailForm(request.POST)
         if form.is_valid():
-            form.save()
+            email = form.save(commit=False)
+            email.user_profile = request.user.profile
+            email.save()
             return redirect("email_list")
     else:
         form = EmailForm()
+        # Filter form choices by user profile
+        form.fields['recipient'].queryset = Recipient.objects.filter(user_profile=request.user.profile)
+        form.fields['template'].queryset = EmailTemplate.objects.filter(user_profile=request.user.profile)
     return render(request, "email_form.html", {"form": form})
 
 
@@ -141,14 +155,21 @@ def campaign_create(request):
         form = EmailCampaignForm(request.POST)
         filter_form = RecipientFilterForm(request.POST)
         if form.is_valid():
-            campaign = form.save()
+            campaign = form.save(commit=False)
+            campaign.user_profile = request.user.profile
+            campaign.save()
             recipient_ids = request.POST.get("recipients", "")
             recipient_ids_list = recipient_ids.split(",")
-            recipients = Recipient.objects.filter(id__in=recipient_ids_list)
+            recipients = Recipient.objects.filter(
+                user_profile=request.user.profile,
+                id__in=recipient_ids_list
+            )
             email_send_candidates = [
                 EmailSendCandidate(
+                    user_profile=request.user.profile,
                     campaign=campaign,
                     recipient=recipient,
+                    template=campaign.template,
                     scheduled_time=campaign.scheduled_time,
                 )
                 for recipient in recipients
@@ -157,16 +178,18 @@ def campaign_create(request):
             return redirect("campaign_list")
     else:
         form = EmailCampaignForm()
+        # Filter template choices by user profile
+        form.fields['template'].queryset = EmailTemplate.objects.filter(user_profile=request.user.profile)
         filter_form = RecipientFilterForm()
-        recipients = Recipient.objects.all()
+        recipients = Recipient.objects.filter(user_profile=request.user.profile)
 
     # Handle filtering
     if request.method == "GET" and "filter" in request.GET:
         filter_form = RecipientFilterForm(request.GET)
         if filter_form.is_valid():
-            recipients = filter_recipients(filter_form.cleaned_data)
+            recipients = filter_recipients(request, filter_form.cleaned_data)
     else:
-        recipients = Recipient.objects.all()
+        recipients = Recipient.objects.filter(user_profile=request.user.profile)
 
     # Implement pagination
     paginator = Paginator(recipients, 25)  # Show 25 recipients per page
@@ -186,8 +209,8 @@ def campaign_create(request):
 
 
 @login_required
-def filter_recipients(filters):
-    qs = Recipient.objects.all()
+def filter_recipients(request, filters):
+    qs = Recipient.objects.filter(user_profile=request.user.profile)
     if filters.get("first_name"):
         qs = qs.filter(first_name__icontains=filters["first_name"])
     if filters.get("last_name"):
@@ -211,7 +234,7 @@ def filter_recipients(filters):
 
 @login_required
 def campaign_list(request):
-    campaigns = EmailCampaign.objects.all()
+    campaigns = EmailCampaign.objects.filter(user_profile=request.user.profile)
     return render(request, "campaign_list.html", {"campaigns": campaigns})
 
 
