@@ -14,28 +14,28 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         now = timezone.now()
 
-        # Get distinct users who have pending emails
-        users_with_pending_emails = (
+        # Get distinct user profiles who have pending emails
+        user_profile_ids = (
             EmailSendCandidate.objects.filter(sent=False, scheduled_time__lte=now)
-            .values_list("campaign__user", flat=True)
+            .values_list("user_profile", flat=True)
             .distinct()
         )
 
-        for user_id in users_with_pending_emails:
-            user_profile = UserProfile.objects.get(user__id=user_id)
+        for user_profile_id in user_profile_ids:
+            user_profile = UserProfile.objects.get(id=user_profile_id)
             user = user_profile.user
 
             max_emails_per_hour = user_profile.max_emails_per_hour
 
             one_hour_ago = now - timezone.timedelta(hours=1)
-            emails_sent_last_hour = EmailLog.objects.filter(campaign__user=user, sent_time__gte=one_hour_ago).count()
+            emails_sent_last_hour = EmailLog.objects.filter(user_profile=user_profile, sent_time__gte=one_hour_ago).count()
             emails_remaining = max_emails_per_hour - emails_sent_last_hour
             if emails_remaining <= 0:
                 self.stdout.write(f"Hourly email limit reached for user {user.username}.")
                 continue
 
             emails_to_send = EmailSendCandidate.objects.filter(
-                sent=False, scheduled_time__lte=now, campaign__user=user
+                sent=False, scheduled_time__lte=now, user_profile=user_profile
             ).order_by("scheduled_time")[:emails_remaining]
 
             for email_candidate in emails_to_send:
@@ -74,6 +74,7 @@ class Command(BaseCommand):
                     email_candidate.sent_time = now
                     email_candidate.save()
                     EmailLog.objects.create(
+                        user_profile=user_profile,
                         recipient=email_candidate.recipient.email,
                         campaign=email_candidate.campaign,
                         status="Sent",
@@ -82,6 +83,7 @@ class Command(BaseCommand):
                     self.stdout.write(f"Email sent to {email_candidate.recipient.email} for user {user.username}")
                 except Exception as e:
                     EmailLog.objects.create(
+                        user_profile=user_profile,
                         recipient=email_candidate.recipient.email,
                         campaign=email_candidate.campaign,
                         status="Failed",
