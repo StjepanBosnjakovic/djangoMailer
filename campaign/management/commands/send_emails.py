@@ -1,12 +1,13 @@
 # campaign/management/commands/send_emails.py
 
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.core.mail.backends.smtp import EmailBackend
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from campaign.models import EmailLog, EmailSendCandidate, UserProfile
+from campaign.models import EmailLog, EmailSendCandidate, UserProfile, EmailEvent
 from campaign.email_backends import DirectEmailBackend
+from campaign.tracking import add_tracking_pixel, replace_links_with_tracking, convert_to_html
 
 
 class Command(BaseCommand):
@@ -59,27 +60,36 @@ class Command(BaseCommand):
                         )
 
                     # Personalize the email body if necessary
-                    message = email_candidate.campaign.template.body.format(
-                        first_name=email_candidate.recipient.first_name,
-                        last_name=email_candidate.recipient.last_name,
-                        company=email_candidate.recipient.company,
-                        free_field1=email_candidate.recipient.free_field1,
-                        free_field2=email_candidate.recipient.free_field2,
-                        free_field3=email_candidate.recipient.free_field3,
+                    plain_message = email_candidate.campaign.template.body.format(
+                        first_name=email_candidate.recipient.first_name or '',
+                        last_name=email_candidate.recipient.last_name or '',
+                        company=email_candidate.recipient.company or '',
+                        free_field1=email_candidate.recipient.free_field1 or '',
+                        free_field2=email_candidate.recipient.free_field2 or '',
+                        free_field3=email_candidate.recipient.free_field3 or '',
                     )
 
-                    email = EmailMessage(
+                    # Convert to HTML and add tracking
+                    html_message = convert_to_html(plain_message)
+                    html_message = add_tracking_pixel(html_message, email_candidate.tracking_id)
+                    html_message = replace_links_with_tracking(html_message, email_candidate.tracking_id)
+
+                    # Create multipart email with plain text and HTML
+                    email = EmailMultiAlternatives(
                         subject=email_candidate.campaign.template.subject,
-                        body=message,
+                        body=plain_message,  # Plain text version
                         from_email=user_profile.from_email,
                         to=[email_candidate.recipient.email],
                         connection=backend,
                     )
+                    email.attach_alternative(html_message, "text/html")
                     email.send()
 
                     email_candidate.sent = True
                     email_candidate.sent_time = now
                     email_candidate.save()
+
+                    # Create EmailLog (for backward compatibility)
                     EmailLog.objects.create(
                         user_profile=user_profile,
                         recipient=email_candidate.recipient.email,
@@ -87,8 +97,17 @@ class Command(BaseCommand):
                         status="Sent",
                         sent_time=now,
                     )
+
+                    # Create EmailEvent for tracking
+                    EmailEvent.objects.create(
+                        email_candidate=email_candidate,
+                        event_type='sent',
+                        metadata={'subject': email_candidate.campaign.template.subject}
+                    )
+
                     self.stdout.write(f"Email sent to {email_candidate.recipient.email} for user {user.username}")
                 except Exception as e:
+                    # Create EmailLog (for backward compatibility)
                     EmailLog.objects.create(
                         user_profile=user_profile,
                         recipient=email_candidate.recipient.email,
@@ -97,6 +116,14 @@ class Command(BaseCommand):
                         error_message=str(e),
                         sent_time=now,
                     )
+
+                    # Create EmailEvent for tracking
+                    EmailEvent.objects.create(
+                        email_candidate=email_candidate,
+                        event_type='failed',
+                        metadata={'error': str(e)}
+                    )
+
                     self.stdout.write(
                         f"Failed to send email to {email_candidate.recipient.email} for user {user.username}: {e}"
                     )
