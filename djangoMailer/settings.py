@@ -32,7 +32,8 @@ FIELD_ENCRYPTION_KEY = os.environ.get(
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
+# Defaults to True for development/testing. Set DEBUG=False in production.
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
 
 # Restrict allowed hosts - use environment variable for production
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
@@ -102,9 +103,6 @@ CRONJOBS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://mailer.apps.pitsolutions.eu",
 ]
-
-CSRF_COOKIE_SECURE = True
-
 
 WSGI_APPLICATION = "djangoMailer.wsgi.application"
 

@@ -427,7 +427,7 @@ This application now includes comprehensive security features:
 
 #### 2. Environment-Based Configuration
 - **SECRET_KEY**: Loaded from environment variable with secure fallback
-- **DEBUG**: Defaults to `False` for production safety
+- **DEBUG**: Defaults to `True` for development/testing, set to `False` in production
 - **ALLOWED_HOSTS**: Configurable via environment variable (comma-separated)
 - **Configuration File**: Use `.env.example` as template
 
@@ -556,8 +556,8 @@ With this implementation:
 ### Production Recommendations
 1. Enable HTTPS only
 2. Use environment variables for all secrets
-3. Restrict `ALLOWED_HOSTS` to your domain
-4. Set `DEBUG = False`
+3. Set `DEBUG=False` via environment variable (critical for security)
+4. Restrict `ALLOWED_HOSTS` to your domain
 5. Configure proper database backups
 6. Implement monitoring and alerting
 7. Use strong passwords for admin accounts
@@ -635,7 +635,7 @@ These issues **must be fixed** before production deployment:
 #### Security Vulnerabilities ✅ COMPLETED
 - [x] **ENCRYPT SMTP passwords** - ✅ Now using django-encrypted-model-fields with EncryptedCharField
 - [x] **Move SECRET_KEY to environment variable** - ✅ SECRET_KEY now reads from environment with fallback
-- [x] **Set DEBUG = False** - ✅ DEBUG now reads from environment variable, defaults to False
+- [x] **Set DEBUG = False** - ✅ DEBUG configurable via environment (defaults to True for dev, set False in production)
 - [x] **Restrict ALLOWED_HOSTS** - ✅ ALLOWED_HOSTS now reads from environment variable
 - [x] **Add rate limiting** - ✅ Login limited to 5/min, registration to 3/hour using django-ratelimit
 - [x] **Add CSRF validation** - ✅ CSRF tokens verified on all forms (already implemented)
