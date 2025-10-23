@@ -483,22 +483,155 @@ Contributions are welcome! This project uses:
 6. Push to the branch: `git push origin feature/your-feature`
 7. Submit a pull request
 
-### Future Enhancements
+## TODO: Project Roadmap
 
-Potential improvements and features:
-- [ ] Comprehensive unit tests
-- [ ] Email template editor UI
-- [ ] Email preview before sending
-- [ ] Pagination for recipient lists
-- [ ] Email attachment support
-- [ ] Webhook support for bounce/complaint handling
-- [ ] Retry logic for failed emails
-- [ ] Email scheduling UI calendar
-- [ ] Dark mode support
-- [ ] Multi-language support
-- [ ] Export email logs to CSV
-- [ ] Advanced analytics and reporting
-- [ ] A/B testing for campaigns
+### 🔴 CRITICAL: Security & Bug Fixes (Priority 1)
+
+These issues **must be fixed** before production deployment:
+
+#### Multi-Tenancy Data Isolation Bug
+- [ ] **FIX: recipient_list view** - Currently shows ALL recipients to all users. Filter by `request.user.profile`
+- [ ] **FIX: template_list view** - Shows all templates to all users. Add `.filter(user_profile=request.user.profile)`
+- [ ] **FIX: email_list view** - Shows all queued emails. Filter by user profile
+- [ ] **FIX: campaign_list view** - Shows all campaigns. Add user-specific filtering
+- [ ] **FIX: log_list view** - Shows all email logs. Filter by campaign user
+- [ ] **TEST: Verify multi-tenancy** - Create test users and verify data isolation
+
+#### Security Vulnerabilities
+- [ ] **ENCRYPT SMTP passwords** - Currently stored in plaintext. Use Django's encryption or django-encrypted-model-fields
+- [ ] **Move SECRET_KEY to environment variable** - Currently hardcoded in settings.py
+- [ ] **Set DEBUG = False** - Production deployments must disable debug mode
+- [ ] **Restrict ALLOWED_HOSTS** - Change from `['*']` to specific domains
+- [ ] **Add rate limiting** - Protect login/registration from brute force attacks
+- [ ] **Add CSRF validation** - Ensure all forms have proper CSRF protection
+- [ ] **Sanitize email inputs** - Add validation for email subjects and bodies to prevent injection
+
+#### Data Integrity Issues
+- [ ] **Fix form user assignment** - EmailTemplateForm, EmailForm, etc. need to assign `user_profile` on save
+- [ ] **Add email validation** - Ensure valid email format before saving recipients
+- [ ] **Prevent duplicate recipients** - Handle unique constraint violations gracefully
+- [ ] **Add null checks in send_emails.py** - Handle missing recipient fields without crashing
+
+### 🟡 High Priority: Missing Core Features (Priority 2)
+
+#### CRUD Operations
+- [ ] **Add Edit Recipient** - Currently can only upload, no edit functionality
+- [ ] **Add Delete Recipient** - No way to remove individual recipients
+- [ ] **Add Edit Template** - Template update view missing
+- [ ] **Add Delete Template** - No template deletion interface
+- [ ] **Add Edit Campaign** - Cannot modify campaigns after creation
+- [ ] **Add Delete Campaign** - Campaign deletion view needed
+- [ ] **Add Manual Recipient Creation** - Form to add recipients without CSV
+
+#### Email Functionality
+- [ ] **Email preview** - Preview personalized email before sending
+- [ ] **Email attachment support** - Allow attaching files to campaigns
+- [ ] **HTML email support** - Rich text editor for email bodies
+- [ ] **Retry logic for failed emails** - Automatic retry with exponential backoff
+- [ ] **Bounce/complaint handling** - Webhook support for email provider feedback
+- [ ] **Email validation before sending** - Test SMTP connection before queuing
+- [ ] **Unsubscribe links** - Add opt-out functionality with tracking
+
+#### Testing Infrastructure (0% Coverage)
+- [ ] **Unit tests for models** - Test all model methods and validation
+- [ ] **Unit tests for views** - Test all view logic and permissions
+- [ ] **Unit tests for forms** - Test form validation and cleaning
+- [ ] **Integration tests for email sending** - Mock SMTP and test workflow
+- [ ] **Test fixtures** - Create sample data for testing
+- [ ] **Test multi-tenancy isolation** - Verify users can't access other users' data
+- [ ] **CI/CD pipeline** - Set up GitHub Actions for automated testing
+- [ ] **Coverage reporting** - Aim for >80% code coverage
+
+### 🟢 Medium Priority: UX & Performance (Priority 3)
+
+#### Pagination & Performance
+- [ ] **Paginate recipient_list** - Currently shows all recipients on one page
+- [ ] **Paginate template_list** - Add pagination for large template lists
+- [ ] **Paginate email_list** - Queue view needs pagination
+- [ ] **Paginate campaign_list** - Campaign list pagination
+- [ ] **Paginate log_list** - Email logs pagination
+- [ ] **Add database indexes** - Index email, scheduled_time, sent fields for performance
+- [ ] **Optimize queries** - Use select_related() and prefetch_related() to avoid N+1 queries
+- [ ] **Add caching** - Cache dashboard statistics and frequently accessed data
+
+#### UI/UX Improvements
+- [ ] **Rich text editor** - WYSIWYG editor for email templates (TinyMCE, CKEditor, or Quill)
+- [ ] **Drag-and-drop CSV upload** - Improve file upload UX
+- [ ] **Calendar UI for scheduling** - Visual date picker for campaign scheduling
+- [ ] **Campaign progress tracking** - Real-time progress bar for sending campaigns
+- [ ] **Dashboard charts** - Add graphs for email statistics (sent, failed, pending)
+- [ ] **Search functionality** - Search recipients, templates, campaigns
+- [ ] **Bulk actions** - Select multiple items for bulk delete/edit
+- [ ] **Export to CSV** - Export recipient lists and email logs
+- [ ] **Dark mode toggle** - Implement dark theme (CSS framework supports it)
+- [ ] **Mobile responsive improvements** - Optimize for smaller screens
+
+### 🔵 Low Priority: Advanced Features (Priority 4)
+
+#### Analytics & Reporting
+- [ ] **Advanced analytics dashboard** - Campaign performance metrics
+- [ ] **Email open tracking** - Track email opens with pixel tracking
+- [ ] **Link click tracking** - Track link clicks in emails
+- [ ] **Campaign comparison** - Compare performance across campaigns
+- [ ] **Export reports to PDF** - Generate campaign performance reports
+- [ ] **A/B testing** - Test multiple email variants
+- [ ] **Delivery rate monitoring** - Alert on low delivery rates
+
+#### Integration & Extensibility
+- [ ] **REST API** - Build API for external integrations
+- [ ] **API authentication** - Token-based auth for API
+- [ ] **Webhook endpoints** - Receive bounce/complaint notifications from email providers
+- [ ] **OAuth SMTP** - Support Gmail/Outlook OAuth instead of passwords
+- [ ] **Multiple email providers** - Support SendGrid, AWS SES, Mailgun APIs
+- [ ] **Import from external sources** - Google Contacts, Mailchimp, etc.
+- [ ] **Custom field definitions** - Allow users to define their own recipient fields
+
+#### User Experience
+- [ ] **Multi-language support (i18n)** - Internationalization for UI
+- [ ] **Email template gallery** - Pre-built templates for common use cases
+- [ ] **Template variables autocomplete** - Suggest available placeholders in editor
+- [ ] **Email validation service** - Verify email deliverability before sending
+- [ ] **Recipient segmentation** - Advanced filtering and tagging
+- [ ] **Campaign scheduling calendar** - Month view for scheduled campaigns
+- [ ] **Notification system** - In-app notifications for campaign completion
+- [ ] **User roles & permissions** - Admin/sender/viewer roles
+
+### 🔧 DevOps & Production Readiness
+
+- [ ] **Environment-based settings** - Separate dev/staging/prod configurations
+- [ ] **Database connection pooling** - Configure pgBouncer or similar
+- [ ] **Redis caching** - Add Redis for session storage and caching
+- [ ] **Celery for background tasks** - Replace cron with Celery for email sending
+- [ ] **Docker Compose for development** - Include PostgreSQL in docker-compose.yml
+- [ ] **Logging configuration** - Structured logging with log rotation
+- [ ] **Monitoring setup** - Sentry for error tracking, Prometheus for metrics
+- [ ] **Database backup automation** - Automated PostgreSQL backups
+- [ ] **Health check endpoints** - /health and /ready endpoints for load balancers
+- [ ] **Static file optimization** - Minification and CDN setup
+- [ ] **SSL/TLS configuration** - Force HTTPS in production
+
+### 📚 Documentation
+
+- [ ] **API documentation** - Auto-generated API docs (if API is built)
+- [ ] **Code comments** - Add docstrings to all functions/classes
+- [ ] **Architecture diagram** - Visual diagram of system components
+- [ ] **Deployment guide** - Step-by-step production deployment
+- [ ] **User manual** - End-user documentation with screenshots
+- [ ] **Developer setup guide** - Contributing documentation
+- [ ] **Changelog** - Track version changes and releases
+
+---
+
+### Priority Summary
+
+**Must fix before production (P1):** 13 critical security and bug fixes
+**Should implement soon (P2):** 24 core features and testing
+**Nice to have (P3):** 17 UX and performance improvements
+**Future roadmap (P4):** 20 advanced features
+**Infrastructure:** 11 DevOps improvements
+**Documentation:** 7 documentation tasks
+
+**Total Items:** 92 tasks across 6 categories
 
 ## License
 
