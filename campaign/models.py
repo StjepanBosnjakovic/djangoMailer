@@ -7,14 +7,18 @@ from encrypted_model_fields.fields import EncryptedCharField
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    smtp_host = models.CharField(max_length=255)
+    smtp_host = models.CharField(max_length=255, blank=True)
     smtp_port = models.IntegerField(default=587)
-    smtp_username = models.CharField(max_length=255)
-    smtp_password = EncryptedCharField(max_length=255)
+    smtp_username = models.CharField(max_length=255, blank=True)
+    smtp_password = EncryptedCharField(max_length=255, blank=True)
     use_tls = models.BooleanField(default=True)
     use_ssl = models.BooleanField(default=False)
     from_email = models.EmailField()
     max_emails_per_hour = models.IntegerField(default=100)
+    direct_send = models.BooleanField(
+        default=False,
+        help_text="Send emails directly to recipient mail servers without using SMTP relay"
+    )
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
