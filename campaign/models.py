@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from encrypted_model_fields.fields import EncryptedCharField
 
 
 class UserProfile(models.Model):
@@ -9,7 +10,7 @@ class UserProfile(models.Model):
     smtp_host = models.CharField(max_length=255)
     smtp_port = models.IntegerField(default=587)
     smtp_username = models.CharField(max_length=255)
-    smtp_password = models.CharField(max_length=255)
+    smtp_password = EncryptedCharField(max_length=255)
     use_tls = models.BooleanField(default=True)
     use_ssl = models.BooleanField(default=False)
     from_email = models.EmailField()

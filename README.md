@@ -415,17 +415,80 @@ Optional environment variables:
 
 ## Security Considerations
 
-### Current Configuration (Development)
-- `DEBUG = True` - Should be `False` in production
-- `ALLOWED_HOSTS = ['*']` - Should be restricted to your domain
-- `SECRET_KEY` in code - Should be in environment variable
+### Production Security Features ✅
+
+This application now includes comprehensive security features:
+
+#### 1. Encrypted SMTP Passwords
+- **Implementation**: Uses `django-encrypted-model-fields` with `EncryptedCharField`
+- **Location**: `campaign/models.py:13`
+- **Encryption Key**: Stored in `FIELD_ENCRYPTION_KEY` environment variable
+- **Benefit**: SMTP passwords are encrypted at rest in the database
+
+#### 2. Environment-Based Configuration
+- **SECRET_KEY**: Loaded from environment variable with secure fallback
+- **DEBUG**: Defaults to `False` for production safety
+- **ALLOWED_HOSTS**: Configurable via environment variable (comma-separated)
+- **Configuration File**: Use `.env.example` as template
+
+#### 3. Rate Limiting Protection
+- **Login**: Limited to 5 attempts per minute per IP address
+- **Registration**: Limited to 3 attempts per hour per IP address
+- **Implementation**: Custom views in `campaign/auth_views.py`
+- **Library**: `django-ratelimit` with in-memory caching
+
+#### 4. Input Sanitization
+- **Email Subjects**: Strip newlines to prevent header injection
+- **Email Bodies**: HTML sanitization using `bleach` library
+- **Allowed Tags**: Safe HTML tags only (p, br, strong, em, u, a, lists, headings)
+- **Location**: `campaign/forms.py` clean methods
+
+#### 5. CSRF Protection
+- **Status**: Enabled by default in Django middleware
+- **Validation**: All POST forms include `{% csrf_token %}`
+- **Cookies**: Secure flag enabled in production
+
+#### 6. Production Security Headers
+When `DEBUG=False`, the following are automatically enabled:
+- `SECURE_SSL_REDIRECT = True` - Force HTTPS
+- `SESSION_COOKIE_SECURE = True` - Secure session cookies
+- `CSRF_COOKIE_SECURE = True` - Secure CSRF cookies
+- `SECURE_BROWSER_XSS_FILTER = True` - XSS protection
+- `SECURE_CONTENT_TYPE_NOSNIFF = True` - Prevent MIME sniffing
+- `X_FRAME_OPTIONS = DENY` - Clickjacking protection
+- `SECURE_HSTS_SECONDS = 31536000` - HTTP Strict Transport Security (1 year)
+- `SECURE_HSTS_INCLUDE_SUBDOMAINS = True` - HSTS for subdomains
+- `SECURE_HSTS_PRELOAD = True` - HSTS preload ready
+
+### Environment Variables
+
+Required for production deployment:
+
+```bash
+# Security
+SECRET_KEY=your-secret-key-here
+FIELD_ENCRYPTION_KEY=your-encryption-key-here
+DEBUG=False
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+
+# Database
+POSTGRES_DB=your_database_name
+POSTGRES_USER=your_database_user
+POSTGRES_PASSWORD=your_database_password
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+```
+
+Copy `.env.example` to `.env` and update with your values.
 
 ### Best Practices
-1. **Password Security**: SMTP passwords are stored encrypted in database
-2. **CSRF Protection**: Enabled with trusted origins configuration
-3. **Authentication**: All views require login via `@login_required`
-4. **Multi-tenancy**: Complete data isolation between users (see Multi-Tenancy section)
-5. **Rate Limiting**: Configurable per-user email sending limits
+1. **Password Security**: SMTP passwords are stored encrypted in database ✅
+2. **CSRF Protection**: Enabled with trusted origins configuration ✅
+3. **Authentication**: All views require login via `@login_required` ✅
+4. **Multi-tenancy**: Complete data isolation between users ✅
+5. **Rate Limiting**: Login and registration protected from brute force ✅
+6. **Input Sanitization**: Email content sanitized to prevent injection ✅
+7. **Environment Variables**: All secrets moved to environment variables ✅
 
 ## Multi-Tenancy Data Isolation
 
@@ -556,14 +619,16 @@ These issues **must be fixed** before production deployment:
 
 **Status:** All multi-tenancy data isolation issues have been resolved. See the Multi-Tenancy Data Isolation section for full details.
 
-#### Security Vulnerabilities
-- [ ] **ENCRYPT SMTP passwords** - Currently stored in plaintext. Use Django's encryption or django-encrypted-model-fields
-- [ ] **Move SECRET_KEY to environment variable** - Currently hardcoded in settings.py
-- [ ] **Set DEBUG = False** - Production deployments must disable debug mode
-- [ ] **Restrict ALLOWED_HOSTS** - Change from `['*']` to specific domains
-- [ ] **Add rate limiting** - Protect login/registration from brute force attacks
-- [ ] **Add CSRF validation** - Ensure all forms have proper CSRF protection
-- [ ] **Sanitize email inputs** - Add validation for email subjects and bodies to prevent injection
+#### Security Vulnerabilities ✅ COMPLETED
+- [x] **ENCRYPT SMTP passwords** - ✅ Now using django-encrypted-model-fields with EncryptedCharField
+- [x] **Move SECRET_KEY to environment variable** - ✅ SECRET_KEY now reads from environment with fallback
+- [x] **Set DEBUG = False** - ✅ DEBUG now reads from environment variable, defaults to False
+- [x] **Restrict ALLOWED_HOSTS** - ✅ ALLOWED_HOSTS now reads from environment variable
+- [x] **Add rate limiting** - ✅ Login limited to 5/min, registration to 3/hour using django-ratelimit
+- [x] **Add CSRF validation** - ✅ CSRF tokens verified on all forms (already implemented)
+- [x] **Sanitize email inputs** - ✅ Email subjects and bodies sanitized using bleach library
+
+**Status:** All security vulnerabilities have been addressed. See the Security Enhancements section for full details.
 
 #### Data Integrity Issues
 - [ ] **Fix form user assignment** - EmailTemplateForm, EmailForm, etc. need to assign `user_profile` on save

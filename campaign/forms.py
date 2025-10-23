@@ -1,4 +1,6 @@
 from django import forms
+from django.core.exceptions import ValidationError
+import bleach
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Field, Layout, Submit
@@ -20,6 +22,25 @@ class EmailTemplateForm(forms.ModelForm):
                 css_class="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none",
             )
         )
+
+    def clean_subject(self):
+        """Sanitize email subject to prevent injection attacks."""
+        subject = self.cleaned_data.get('subject', '')
+        # Remove any newline characters that could be used for header injection
+        sanitized_subject = subject.replace('\n', '').replace('\r', '').strip()
+        # Limit length to prevent abuse
+        if len(sanitized_subject) > 255:
+            raise ValidationError("Subject line is too long (max 255 characters).")
+        return sanitized_subject
+
+    def clean_body(self):
+        """Sanitize email body to prevent XSS and injection attacks."""
+        body = self.cleaned_data.get('body', '')
+        # Allow basic HTML tags but strip dangerous ones
+        allowed_tags = ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+        allowed_attributes = {'a': ['href', 'title']}
+        sanitized_body = bleach.clean(body, tags=allowed_tags, attributes=allowed_attributes, strip=True)
+        return sanitized_body
 
     class Meta:
         model = EmailTemplate
