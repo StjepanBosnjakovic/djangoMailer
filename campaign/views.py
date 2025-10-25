@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from .forms import EmailCampaignForm, EmailForm, EmailTemplateForm, RecipientFilterForm, RecipientUploadForm, UserProfileForm
-from .models import EmailCampaign, EmailLog, EmailSendCandidate, EmailTemplate, Recipient, UserProfile
+from .models import EmailCampaign, EmailLog, EmailSendCandidate, EmailTemplate, Recipient, UserProfile, EmailEvent, CampaignStatistics
 
 
 @login_required
@@ -266,3 +266,57 @@ def send_email_now(request, pk):
 
     messages.success(request, "Email scheduled to be sent immediately.")
     return redirect("email_list")
+
+
+@login_required
+def campaign_statistics(request, campaign_id):
+    """
+    Display detailed statistics for a specific email campaign.
+    """
+    campaign = get_object_or_404(EmailCampaign, id=campaign_id, user_profile=request.user.profile)
+
+    # Get or create statistics object
+    stats, created = CampaignStatistics.objects.get_or_create(campaign=campaign)
+
+    # Update statistics if requested or if newly created
+    if request.GET.get('refresh') == 'true' or created:
+        stats.update_statistics()
+
+    # Get detailed event breakdown
+    email_candidates = campaign.emailsendcandidate_set.all()
+
+    # Calculate additional metrics
+    event_timeline = EmailEvent.objects.filter(
+        email_candidate__campaign=campaign
+    ).values('event_type').order_by('timestamp')[:100]  # Last 100 events
+
+    # Get top clicked links
+    from django.db.models import Count
+    clicked_events = EmailEvent.objects.filter(
+        email_candidate__campaign=campaign,
+        event_type='clicked'
+    ).values('metadata__url').annotate(
+        click_count=Count('id')
+    ).order_by('-click_count')[:10]
+
+    # Calculate engagement over time (opens per day)
+    from django.db.models.functions import TruncDate
+    opens_by_date = EmailEvent.objects.filter(
+        email_candidate__campaign=campaign,
+        event_type='opened'
+    ).annotate(
+        date=TruncDate('timestamp')
+    ).values('date').annotate(
+        count=Count('id')
+    ).order_by('date')
+
+    context = {
+        'campaign': campaign,
+        'stats': stats,
+        'email_candidates': email_candidates,
+        'event_timeline': event_timeline,
+        'clicked_links': clicked_events,
+        'opens_by_date': list(opens_by_date),
+    }
+
+    return render(request, 'campaign_statistics.html', context)

@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from . import tracking_views
 
 urlpatterns = [
     path("", views.home, name="home"),  # Home page
@@ -17,4 +18,13 @@ urlpatterns = [
     path("campaigns/", views.campaign_list, name="campaign_list"),
     path("campaigns/create/", views.campaign_create, name="campaign_create"),
     path("profile/edit/", views.edit_profile, name="edit_profile"),
+
+    # Email tracking endpoints
+    path("track/pixel/<uuid:tracking_id>/", tracking_views.tracking_pixel, name="email_tracking_pixel"),
+    path("track/click/<uuid:tracking_id>/", tracking_views.tracking_click, name="email_tracking_click"),
+    path("track/bounce/", tracking_views.bounce_webhook, name="email_bounce_webhook"),
+    path("track/delivery/", tracking_views.delivery_webhook, name="email_delivery_webhook"),
+
+    # Campaign statistics
+    path("campaigns/<int:campaign_id>/statistics/", views.campaign_statistics, name="campaign_statistics"),
 ]

@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Campaign Statistics - {{ campaign.name }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Campaign Statistics</h1>
+        <p class="text-gray-600 dark:text-gray-400">{{ campaign.name }}</p>
+    </div>
+
+    <div class="mb-4 flex gap-2">
+        <a href="{% url 'campaign_list' %}" class="inline-block px-4 py-2 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400">
+            Back to Campaigns
+        </a>
+        <a href="?refresh=true" class="inline-block px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            Refresh Statistics
+        </a>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Total Recipients</h3>
+            <p class="text-3xl font-bold text-gray-800 dark:text-gray-100">{{ stats.total_recipients }}</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Sent</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ stats.sent_count }}</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Delivered</h3>
+            <p class="text-3xl font-bold text-green-600">{{ stats.delivered_count }}</p>
+            <p class="text-sm text-gray-500">{{ stats.delivery_rate }}% delivery rate</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Bounced</h3>
+            <p class="text-3xl font-bold text-red-600">{{ stats.bounced_count }}</p>
+            <p class="text-sm text-gray-500">{{ stats.bounce_rate }}% bounce rate</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Unique Opens</h3>
+            <p class="text-3xl font-bold text-purple-600">{{ stats.unique_opens }}</p>
+            <p class="text-sm text-gray-500">{{ stats.open_rate }}% open rate</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Total Opens</h3>
+            <p class="text-3xl font-bold text-purple-400">{{ stats.opened_count }}</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Unique Clicks</h3>
+            <p class="text-3xl font-bold text-indigo-600">{{ stats.unique_clicks }}</p>
+            <p class="text-sm text-gray-500">{{ stats.click_rate }}% click rate</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Total Clicks</h3>
+            <p class="text-3xl font-bold text-indigo-400">{{ stats.clicked_count }}</p>
+        </div>
+    </div>
+
+    <!-- Top Clicked Links -->
+    {% if clicked_links %}
+    <div class="mb-6">
+        <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Top Clicked Links</h2>
+        <div class="overflow-x-auto relative shadow-md rounded-lg">
+            <table class="w-full text-sm text-left text-gray-700 dark:text-gray-200">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-200">
+                    <tr>
+                        <th scope="col" class="py-3 px-4">URL</th>
+                        <th scope="col" class="py-3 px-4">Clicks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for link in clicked_links %}
+                    <tr class="border-b dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="py-3 px-4">
+                            <a href="{{ link.metadata__url }}" target="_blank" class="text-blue-600 hover:underline">
+                                {{ link.metadata__url|truncatechars:80 }}
+                            </a>
+                        </td>
+                        <td class="py-3 px-4">{{ link.click_count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Email Opens Over Time -->
+    {% if opens_by_date %}
+    <div class="mb-6">
+        <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Email Opens Over Time</h2>
+        <div class="overflow-x-auto relative shadow-md rounded-lg">
+            <table class="w-full text-sm text-left text-gray-700 dark:text-gray-200">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-200">
+                    <tr>
+                        <th scope="col" class="py-3 px-4">Date</th>
+                        <th scope="col" class="py-3 px-4">Opens</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in opens_by_date %}
+                    <tr class="border-b dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="py-3 px-4">{{ item.date|date:"Y-m-d" }}</td>
+                        <td class="py-3 px-4">{{ item.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Events -->
+    {% if event_timeline %}
+    <div class="mb-6">
+        <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Recent Events</h2>
+        <div class="overflow-x-auto relative shadow-md rounded-lg">
+            <table class="w-full text-sm text-left text-gray-700 dark:text-gray-200">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-200">
+                    <tr>
+                        <th scope="col" class="py-3 px-4">Event Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in event_timeline %}
+                    <tr class="border-b dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 rounded text-xs font-semibold
+                                {% if event.event_type == 'sent' %}bg-blue-200 text-blue-800{% endif %}
+                                {% if event.event_type == 'delivered' %}bg-green-200 text-green-800{% endif %}
+                                {% if event.event_type == 'opened' %}bg-purple-200 text-purple-800{% endif %}
+                                {% if event.event_type == 'clicked' %}bg-indigo-200 text-indigo-800{% endif %}
+                                {% if event.event_type == 'bounced' %}bg-red-200 text-red-800{% endif %}
+                                {% if event.event_type == 'failed' %}bg-gray-200 text-gray-800{% endif %}
+                            ">
+                                {{ event.event_type|upper }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="text-sm text-gray-500 dark:text-gray-400 mt-4">
+        Last updated: {{ stats.last_updated|date:"Y-m-d H:i:s" }}
+    </div>
+</div>
+{% endblock %}

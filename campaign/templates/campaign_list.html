@@ -20,6 +20,7 @@
                     <th scope="col" class="py-3 px-4">Template</th>
                     <th scope="col" class="py-3 px-4">Scheduled Time</th>
                     <th scope="col" class="py-3 px-4">Recipients</th>
+                    <th scope="col" class="py-3 px-4">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -29,10 +30,13 @@
                     <td class="py-3 px-4">{{ campaign.template.name }}</td>
                     <td class="py-3 px-4">{{ campaign.scheduled_time|date:"Y-m-d H:i:s" }}</td>
                     <td class="py-3 px-4">{{ campaign.recipients.count }}</td>
+                    <td class="py-3 px-4">
+                        <a href="{% url 'campaign_statistics' campaign.id %}" class="text-blue-600 hover:underline">View Statistics</a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="py-3 px-4 text-center text-gray-500">No email campaigns found.</td>
+                    <td colspan="5" class="py-3 px-4 text-center text-gray-500">No email campaigns found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
