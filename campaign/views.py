@@ -4,6 +4,7 @@ import io
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -118,6 +119,67 @@ def recipient_upload(request):
     else:
         form = RecipientUploadForm()
     return render(request, "recipient_upload.html", {"form": form})
+
+
+@login_required
+def download_example_csv(request):
+    """Generate and download an example CSV file with recipient data structure."""
+    # Create the HttpResponse object with CSV header
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="recipients_example.csv"'
+
+    # Create CSV writer
+    writer = csv.writer(response)
+
+    # Write header row
+    writer.writerow([
+        "first_name",
+        "last_name",
+        "company",
+        "email",
+        "country",
+        "city",
+        "free_field1",
+        "free_field2",
+        "free_field3",
+    ])
+
+    # Write example data rows
+    writer.writerow([
+        "John",
+        "Doe",
+        "Acme Corp",
+        "john.doe@example.com",
+        "USA",
+        "New York",
+        "Sales",
+        "Premium",
+        "2024",
+    ])
+    writer.writerow([
+        "Jane",
+        "Smith",
+        "Tech Solutions Inc",
+        "jane.smith@example.com",
+        "Canada",
+        "Toronto",
+        "Marketing",
+        "Standard",
+        "2023",
+    ])
+    writer.writerow([
+        "Bob",
+        "Johnson",
+        "Global Industries",
+        "bob.johnson@example.com",
+        "UK",
+        "London",
+        "Support",
+        "Enterprise",
+        "2025",
+    ])
+
+    return response
 
 
 @login_required

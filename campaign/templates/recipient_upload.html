@@ -1,25 +1,78 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
-{% block title %}Email Templates{% endblock %}
+{% block title %}Upload Recipients{% endblock %}
 
 {% block content %}
-<head>
-    <title>Upload Recipients</title>
-</head>
-<body>
-    <h1>Upload Recipients</h1>
+<div class="container mx-auto px-4 max-w-4xl">
+    <h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">Upload Recipients</h1>
+
+    <!-- Messages -->
     {% if messages %}
-    <ul>
+    <div class="mb-6">
         {% for message in messages %}
-        <li>{{ message }}</li>
+        <div class="p-4 rounded-lg mb-3 {% if message.tags == 'success' %}bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200{% elif message.tags == 'error' %}bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-200{% else %}bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-200{% endif %}">
+            {{ message }}
+        </div>
         {% endfor %}
-    </ul>
+    </div>
     {% endif %}
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.csv_file.label_tag }}<br>
-        {{ form.csv_file }}<br><br>
-        <button type="submit" class=""w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"">Upload</button>
-    </form>
-</body>
+
+    <!-- Instructions Card -->
+    <div class="mb-6 p-6 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">CSV Import Instructions</h3>
+                <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                    <p class="mb-2">Upload a CSV file containing your recipients. The CSV must include the following columns in order:</p>
+                    <ul class="list-disc list-inside space-y-1 ml-2">
+                        <li><strong>first_name</strong> - Recipient's first name (required)</li>
+                        <li><strong>last_name</strong> - Recipient's last name (required)</li>
+                        <li><strong>company</strong> - Company name (optional)</li>
+                        <li><strong>email</strong> - Email address (required)</li>
+                        <li><strong>country</strong> - Country (optional)</li>
+                        <li><strong>city</strong> - City (optional)</li>
+                        <li><strong>free_field1</strong> - Custom field 1 (optional)</li>
+                        <li><strong>free_field2</strong> - Custom field 2 (optional)</li>
+                        <li><strong>free_field3</strong> - Custom field 3 (optional)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Example CSV Button -->
+    <div class="mb-6">
+        <a href="{% url 'download_example_csv' %}" class="inline-flex items-center px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Download Example CSV
+        </a>
+    </div>
+
+    <!-- Upload Form Card -->
+    <div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Upload CSV File</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form|crispy }}
+        </form>
+    </div>
+
+    <!-- Back to Recipients List -->
+    <div class="mt-6">
+        <a href="{% url 'recipient_list' %}" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Recipients List
+        </a>
+    </div>
+</div>
 {% endblock %}
